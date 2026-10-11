@@ -1,0 +1,2 @@
+0 * * * * /root/update_container.sh >> /var/log/update_container.log 2>&1
+0 20 * * * /root/backup.sh >> /var/log/backup.log 2>&1

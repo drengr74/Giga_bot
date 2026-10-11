@@ -26,6 +26,10 @@ yandex_ai.py      # Запросы к YandexGPT через Yandex AI Studio SDK
 requirements.txt  # Python-зависимости
 Dockerfile        # Сборка образа
 .env.example      # Шаблон переменных окружения
+deploy/
+  update_container.sh  # Ежечасное автообновление контейнера на сервере
+  backup.sh            # Ежедневный бэкап базы Dokploy и данных n8n
+  crontab              # Расписание запуска скриптов
 ```
 
 ## Настройка
@@ -97,6 +101,25 @@ docker buildx build --platform linux/amd64 \
 ```bash
 tail -n 20 /var/log/update_container.log   # журнал обновлений
 docker logs -f giga-bot                     # логи бота
+```
+
+### Установка скриптов на новый сервер
+
+Скрипты из папки `deploy/` копируются в `/root`, расписание — в crontab пользователя root:
+
+```bash
+scp deploy/update_container.sh deploy/backup.sh root@<сервер>:/root/
+scp deploy/crontab root@<сервер>:/tmp/crontab
+ssh root@<сервер> 'chmod 700 /root/*.sh && crontab /tmp/crontab'
+```
+
+Перед этим на сервере должны лежать `/root/.env` и `/root/russiantrustedca.pem`. Команда `crontab /tmp/crontab` заменяет всё текущее расписание root.
+
+`backup.sh` каждый день в 20:00 UTC сохраняет дамп базы Dokploy (`pg_dump`) и согласованную копию SQLite-базы n8n вместе с ключом шифрования в `/root/backups` и хранит копии 14 дней. Имя тома n8n задано в переменной `N8N_VOLUME`.
+
+```bash
+tail -n 20 /var/log/backup.log   # журнал бэкапов
+ls -lh /root/backups/*/          # список копий
 ```
 
 ## Логи
