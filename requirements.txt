@@ -1,0 +1,6 @@
+gigachat
+logtail-python
+python-dotenv
+pyTelegramBotAPI
+yandex-ai-studio-sdk
+yandex-cloud-ml-sdk

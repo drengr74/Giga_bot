@@ -1,0 +1,6 @@
+**/__pycache__/
+**/*.zip
+**/*.png
+**/*.code-workspace
+**/.*/
+.env
